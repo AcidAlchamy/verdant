@@ -1,6 +1,6 @@
 /*! VERDANT — a season in one scroll
  *  Hand-written WebGL2. No frameworks, no 3D library, no image assets.
- *  build 202608110931 · 8 modules · 93 KB
+ *  build 202608110937 · 8 modules · 93 KB
  */
 (function(){
 'use strict';
