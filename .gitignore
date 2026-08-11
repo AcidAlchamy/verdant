@@ -1,0 +1,13 @@
+# Capture rig output — regenerate with `python capture.py`
+captures/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Editors / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

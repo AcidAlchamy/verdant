@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<base href="./">
+<title>Verdant · A Season In One Scroll</title>
+<meta name="description" content="A single seed becomes a canopy. Verdant is a scroll-driven WebGL film about growth — procedural trees, GPU-simulated pollen, and light through leaves. Rendered entirely on the GPU, no images, no libraries.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Verdant · A Season In One Scroll">
+<meta property="og:description" content="A single seed becomes a canopy. A scroll-driven WebGL film about growth.">
+<meta property="og:image" content="assets/meta/social.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="assets/meta/social.jpg">
+<meta name="theme-color" content="#07090a">
+<link rel="icon" href="assets/meta/favicon.svg" type="image/svg+xml">
+<style>
+html,body,#Stage{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#07090a;touch-action:none;-ms-touch-action:none}
+#Stage,#Stage *{user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+canvas{display:block;position:fixed;top:0;left:0}
+/* The accessibility + crawler mirror. Real semantic DOM, zero pixels. */
+.A11y{position:absolute;top:0;left:0;width:0;height:100%;clip:rect(0 0 0 0);overflow:hidden;pointer-events:none}
+.A11y *{position:relative;color:#fff;font:16px/1.4 serif}
+/* Boot veil — the only styled DOM the visitor ever sees. */
+#Boot{position:fixed;inset:0;background:#07090a;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:22px;transition:opacity .9s cubic-bezier(.4,0,.2,1);z-index:10;font:300 11px/1 ui-monospace,"Cascadia Mono",Consolas,monospace;letter-spacing:.34em;color:#4d5a4f;text-transform:uppercase}
+#Boot.out{opacity:0;pointer-events:none}
+#BootBar{width:132px;height:1px;background:rgba(120,140,120,.18);position:relative;overflow:hidden}
+#BootBar i{position:absolute;inset:0;background:#8fa885;transform:scaleX(0);transform-origin:0 50%;transition:transform .4s cubic-bezier(.4,0,.2,1)}
+#Fail{max-width:30ch;text-align:center;line-height:1.9;letter-spacing:.12em;text-transform:none;display:none}
+/* The one piece of real DOM in the composition. A link should be a link:
+   focusable, middle-clickable, and readable by anything that isn't a browser. */
+#Src{position:fixed;top:0;right:0;z-index:12;display:flex;align-items:center;gap:9px;
+  padding:18px 22px;color:#cfe2d0;text-decoration:none;opacity:0;transform:translateY(-6px);
+  transition:opacity .8s cubic-bezier(.4,0,.2,1) .35s,transform .8s cubic-bezier(.4,0,.2,1) .35s;
+  font:400 10px/1 ui-monospace,"Cascadia Mono",Consolas,monospace;letter-spacing:.28em;text-transform:uppercase}
+#Src.in{opacity:.62;transform:none}
+#Src:hover,#Src:focus-visible{opacity:1}
+#Src svg{width:17px;height:17px;fill:currentColor;flex:none;filter:drop-shadow(0 1px 3px rgba(0,0,0,.55))}
+#Src span{max-width:0;overflow:hidden;white-space:nowrap;opacity:0;
+  transition:max-width .45s cubic-bezier(.4,0,.2,1),opacity .3s;text-shadow:0 1px 4px rgba(0,0,0,.6)}
+#Src:hover span,#Src:focus-visible span{max-width:9rem;opacity:1}
+#Src:focus-visible{outline:1px solid rgba(190,225,190,.6);outline-offset:-8px;border-radius:3px}
+@media (max-width:600px){#Src{padding:13px 15px}#Src span{display:none}}
+</style>
+<script>
+// ---- Support gate. Modern syntax + WebGL2 or nothing. No polyfills, no ES5 path.
+(function(){
+  window._ENV_ = 'production';
+  window._CACHE_ = '202608110931';
+  // Mount point. '/' when the site owns its origin; '/verdant/' when it is a
+  // sub-path of a larger site. build.py --base rewrites this and <base href>.
+  window._BASE_ = '/';
+  try { eval('let o={};o?.a;const f=(x=1)=>({...o,x});'); } catch(e){ return fail('This experience needs a current browser.'); }
+  var c = document.createElement('canvas'), gl = c.getContext('webgl2', {failIfMajorPerformanceCaveat:false});
+  if (!gl) return fail('This experience needs WebGL 2. Try Chrome, Edge, Firefox or Safari 16+.');
+  window._MAX_TEX_ = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+  window._FLOAT_RT_ = !!gl.getExtension('EXT_color_buffer_float');
+  window._HALF_RT_  = !!gl.getExtension('EXT_color_buffer_half_float') || window._FLOAT_RT_;
+  window._ANISO_    = gl.getExtension('EXT_texture_filter_anisotropic');
+  var dbg = gl.getExtension('WEBGL_debug_renderer_info');
+  window._GPU_ = dbg ? String(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL)).toLowerCase() : '';
+  var s = document.createElement('script');
+  s.src = 'assets/js/verdant.' + window._CACHE_ + '.js';
+  s.async = true;
+  document.head.appendChild(s);
+  function fail(msg){
+    document.addEventListener('DOMContentLoaded', function(){
+      var b = document.getElementById('BootBar'), f = document.getElementById('Fail');
+      if (b) b.style.display='none';
+      if (f) { f.style.display='block'; f.textContent = msg; }
+    });
+  }
+})();
+</script>
+</head>
+<body>
+<div id="Stage"></div>
+<a id="Src" href="https://github.com/AcidAlchamy/verdant" target="_blank" rel="noopener"
+   aria-label="View the Verdant source code on GitHub" title="Source on GitHub">
+  <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+  <span>source</span>
+</a>
+<div id="Boot"><div id="BootBar"><i></i></div><div id="Fail"></div></div>
+<noscript><p style="color:#8fa885;font:14px serif;padding:40px">Verdant is a real-time WebGL film. Please enable JavaScript.</p></noscript>
+</body>
+</html>
